@@ -1,6 +1,6 @@
 name: "ROC Network Analysis"
-description: "Run ROC deep packet inspection tool in a Docker container"
-author: "Hanshal"
+description: ""
+author: "SecurableAI"
 
 inputs:
   server-url:
