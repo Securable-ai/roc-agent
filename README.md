@@ -94,22 +94,6 @@ jobs:
 | `ssl-lib-path` | No | `/lib/x86_64-linux-gnu` | Path to SSL library on host system |
 | `ssl-lib-version` | No | `"3"` | SSL library version (3 for libssl.so.3, 1.1 for libssl.so.1.1) |
 
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| `container-id` | ROC container ID |
-| `output-files` | List of generated output files |
-| `logs` | ROC container logs |
-
-### Output Directory
-
-The action will create an output directory with analysis results, including:
-- JSON logs of network activity
-- Matched pattern reports
-- Performance metrics
-- Summary reports
-
 ## Development
 
 ### Local Development
