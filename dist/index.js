@@ -30402,8 +30402,8 @@ async function run() {
       ];
     }
 
-    // Build docker command
-    const dockerArgs = [
+    // Build docker run command
+    const dockerRunCmd = [
       "run",
       "-d",
       "--name",
@@ -30431,172 +30431,28 @@ async function run() {
       "/tmp/roc-output",
     ];
 
-    // Add additional arguments if provided
-    if (additionalArgs.trim()) {
-      dockerArgs.push(...additionalArgs.trim().split(" "));
+    core.info(`Running Docker command: ${dockerRunCmd.join(" ")}`);
+    const dockerRunExitCode = await exec.exec(
+      dockerRunCmd[0],
+      dockerRunCmd.slice(1),
+    );
+    if (dockerRunExitCode !== 0) {
+      core.setFailed(`Docker run failed with exit code ${dockerRunExitCode}`);
+      return;
     }
 
-    core.info("Starting ROC container...");
-    core.info(`Docker command: docker ${dockerArgs.join(" ")}`);
+    await new Promise((resolve) => setTimeout(resolve, 20000));
 
-    // Run the container
-    const exitCode = await exec.exec("docker", dockerArgs);
-
-    if (exitCode !== 0) {
-      throw new Error(`Failed to start ROC container. Exit code: ${exitCode}`);
-    }
-
-    // Get container ID
-    let containerId = "";
-    await exec.exec("docker", ["ps", "-q", "--filter", "name=roc-test"], {
-      listeners: {
-        stdout: (data) => {
-          containerId += data.toString();
-        },
-      },
-    });
-
-    containerId = containerId.trim();
-    core.setOutput("container-id", containerId);
-    core.info(`ROC container started with ID: ${containerId}`);
-
-    // Monitor container status
-    await monitorContainer(containerId);
-
-    // Get output files
-    const outputFiles = await getOutputFiles(outputDir);
-    core.setOutput("output-files", outputFiles);
-    core.info(`Output files: ${outputFiles}`);
-
-    // Get logs
-    const logs = await getContainerLogs(containerId);
-    core.setOutput("logs", logs);
-    core.info("ROC container logs captured");
+    core.setOutput("container_name", containerName);
+    core.info(
+      `Container '${containerName}' started and ready for external interaction.`,
+    );
   } catch (error) {
     core.setFailed(error.message);
     core.error(error.stack);
-  } finally {
-    // Always cleanup
-    await cleanupContainer();
   }
 }
 
-async function checkSslLibraries(sslLibPath, sslLibVersion) {
-  try {
-    const sslPath = path.join(sslLibPath, `libssl.so.${sslLibVersion}`);
-    const cryptoPath = path.join(sslLibPath, `libcrypto.so.${sslLibVersion}`);
-
-    const sslExists = await fs.pathExists(sslPath);
-    const cryptoExists = await fs.pathExists(cryptoPath);
-
-    if (sslExists && cryptoExists) {
-      core.info(`Found SSL libraries: ${sslPath}, ${cryptoPath}`);
-      return true;
-    }
-
-    core.warning(`SSL libraries not found: ${sslPath}, ${cryptoPath}`);
-    return false;
-  } catch (error) {
-    core.warning(`Error checking SSL libraries: ${error.message}`);
-    return false;
-  }
-}
-
-async function monitorContainer(containerId) {
-  core.info("Monitoring ROC container...");
-
-  // Check container status periodically
-  for (let i = 0; i < 30; i++) {
-    // Check for 5 minutes (30 * 10 seconds)
-    let status = "";
-    try {
-      await exec.exec(
-        "docker",
-        ["inspect", "--format", "{{.State.Status}}", containerId],
-        {
-          listeners: {
-            stdout: (data) => {
-              status += data.toString().trim();
-            },
-          },
-        },
-      );
-
-      if (status === "running") {
-        core.info("ROC container is running");
-        break;
-      } else if (status === "exited") {
-        core.warning("ROC container has exited");
-        break;
-      }
-
-      core.info(`Container status: ${status}, waiting...`);
-      await sleep(10000); // Wait 10 seconds
-    } catch (error) {
-      core.warning(`Could not inspect container: ${error.message}`);
-      break;
-    }
-  }
-
-  // Show current logs
-  await exec.exec("docker", ["logs", containerId]);
-}
-
-async function getOutputFiles(outputDir) {
-  try {
-    const files = await fs.readdir(outputDir);
-    return files.join("\n");
-  } catch (error) {
-    core.warning(`Could not read output directory: ${error.message}`);
-    return "";
-  }
-}
-
-async function getContainerLogs(containerId) {
-  try {
-    let logs = "";
-    await exec.exec("docker", ["logs", containerId], {
-      listeners: {
-        stdout: (data) => {
-          logs += data.toString();
-        },
-        stderr: (data) => {
-          logs += data.toString();
-        },
-      },
-    });
-    return logs;
-  } catch (error) {
-    core.warning(`Could not get container logs: ${error.message}`);
-    return "";
-  }
-}
-
-async function cleanupContainer() {
-  try {
-    core.info("Cleaning up ROC container...");
-
-    // Stop container
-    await exec.exec("docker", ["stop", "roc-test"], {
-      ignoreReturnCode: true,
-    });
-
-    // Remove container
-    await exec.exec("docker", ["rm", "roc-test"], {
-      ignoreReturnCode: true,
-    });
-
-    core.info("Container cleanup completed");
-  } catch (error) {
-    core.warning(`Cleanup error: ${error.message}`);
-  }
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-// Run the action
 run();
 
 module.exports = __webpack_exports__;
