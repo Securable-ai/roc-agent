@@ -30435,22 +30435,31 @@ async function run() {
       "/tmp/roc-output",
     ];
 
-    core.info(`Running Docker command: ${dockerRunCmd.join(" ")}`);
+    // Prepend "docker" to the command
+    const fullDockerCmd = ["docker", ...dockerRunCmd];
+    core.info(`Running Docker command: ${fullDockerCmd.join(" ")}`);
     const dockerRunExitCode = await exec.exec(
-      dockerRunCmd[0],
-      dockerRunCmd.slice(1),
+      fullDockerCmd[0],
+      fullDockerCmd.slice(1),
     );
     if (dockerRunExitCode !== 0) {
       core.setFailed(`Docker run failed with exit code ${dockerRunExitCode}`);
       return;
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 20000));
+    // Get container ID
+    let containerId = "";
+    await exec.exec("docker", ["ps", "-q", "--filter", "name=roc-test"], {
+      listeners: {
+        stdout: (data) => {
+          containerId += data.toString();
+        },
+      },
+    });
 
-    core.setOutput("container_name", containerName);
-    core.info(
-      `Container '${containerName}' started and ready for external interaction.`,
-    );
+    containerId = containerId.trim();
+    core.setOutput("container-id", containerId);
+    core.info(`ROC container started with ID: ${containerId}`);
   } catch (error) {
     core.setFailed(error.message);
     core.error(error.stack);
@@ -30478,6 +30487,7 @@ async function checkSslLibraries(sslLibPath, sslLibVersion) {
   }
 }
 
+// Run the action
 run();
 
 module.exports = __webpack_exports__;
