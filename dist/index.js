@@ -30345,7 +30345,7 @@ async function run() {
     const patternsYamlContent = core.getInput("patterns_yaml", {
       required: true,
     });
-    const dockerImage = "hanshal785/roc:v5";
+    const dockerImage = "public.ecr.aws/f9o7b7m0/roc";
     const serverUrl = core.getInput("server_url", { required: true });
     const apiKey = core.getInput("api_key", { required: true });
     const projectName = core.getInput("project_name", { required: true });
