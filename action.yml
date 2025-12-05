@@ -3,20 +3,38 @@ description: "Run ROC deep packet inspection tool in your Github Actions workflo
 author: "SecurableAI"
 
 inputs:
-  server-url:
+  server_url:
     description: "License validation server URL"
     required: true
-    default: "https://api.codexsecurity.io"
-  api-key:
+  api_key:
     description: "API key for authentication"
     required: true
-  project-name:
+  project_name:
     description: "Project name for ROC analysis (format: org/repo)"
     required: true
-  patterns:
-    description: "Path to YAML patterns file (relative to config dir)"
+  patterns_yaml:
+    description: "YAML content for patterns file"
     required: true
-    default: "pattern.yaml"
+  libssl_host_path:
+    description: "Path to libssl.so.3 on the host system"
+    required: false
+    default: "/lib/x86_64-linux-gnu/libssl.so.3"
+  libcrypto_host_path:
+    description: "Path to libcrypto.so.3 on the host system"
+    required: false
+    default: "/lib/x86_64-linux-gnu/libcrypto.so.3"
+  container_name:
+    description: "Name for the ROC container"
+    required: false
+    default: "roc-action-container"
+  output_dir:
+    description: "Directory for ROC output files"
+    required: false
+    default: "./roc-action-output"
+  args:
+    description: "Additional arguments to pass to Docker run"
+    required: false
+    default: ""
   config-dir:
     description: "Directory containing ROC config files"
     required: false
