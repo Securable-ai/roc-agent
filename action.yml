@@ -1,5 +1,5 @@
-name: "ROC Network Analysis"
-description: ""
+name: "ROC Agent"
+description: "Run ROC deep packet inspection tool in your Github Actions workflow"
 author: "SecurableAI"
 
 inputs:
