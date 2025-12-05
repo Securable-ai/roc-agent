@@ -102,36 +102,6 @@ jobs:
 | `output-files` | List of generated output files |
 | `logs` | ROC container logs |
 
-## Configuration
-
-### Pattern Files
-
-The action requires a pattern file that defines the rules for network analysis. Create a YAML file with your desired patterns and reference it using the `patterns` input parameter.
-
-Example pattern file structure:
-```yaml
-patterns:
-  - name: suspicious_traffic
-    description: Detects suspicious network traffic patterns
-    match:
-      protocol: tcp
-      port: 80
-    severity: high
-```
-
-### Configuration Directory
-
-The action expects a configuration directory with the following structure:
-```
-roc-config/
-├── pattern.yaml
-├── rules/
-│   ├── rule1.yaml
-│   └── rule2.yaml
-└── filters/
-    └── network_filters.yaml
-```
-
 ### Output Directory
 
 The action will create an output directory with analysis results, including:
