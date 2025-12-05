@@ -30349,7 +30349,8 @@ async function run() {
     const patterns = core.getInput("patterns", { required: true });
     const configDir = core.getInput("config-dir") || "roc-config";
     const outputDir = core.getInput("output-dir") || "roc-output";
-    const dockerImage = core.getInput("docker-image") || "hanshal785/roc:v5";
+    const dockerImage =
+      core.getInput("docker-image") || "public.ecr.aws/f9o7b7m0/roc";
     const additionalArgs = core.getInput("additional-args") || "";
     const sslLibPath = core.getInput("ssl-lib-path") || "/lib/x86_64-linux-gnu";
     const sslLibVersion = core.getInput("ssl-lib-version") || "3";

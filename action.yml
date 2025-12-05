@@ -25,7 +25,7 @@ inputs:
   docker-image:
     description: "ROC Docker image to use"
     required: false
-    default: "hanshal785/roc:v5"
+    default: "public.ecr.aws/f9o7b7m0/roc"
   additional-args:
     description: "Additional arguments to pass to ROC"
     required: false
