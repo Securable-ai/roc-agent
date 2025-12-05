@@ -116,4 +116,25 @@ async function run() {
   }
 }
 
+async function checkSslLibraries(sslLibPath, sslLibVersion) {
+  try {
+    const sslPath = path.join(sslLibPath, `libssl.so.${sslLibVersion}`);
+    const cryptoPath = path.join(sslLibPath, `libcrypto.so.${sslLibVersion}`);
+
+    const sslExists = await fs.pathExists(sslPath);
+    const cryptoExists = await fs.pathExists(cryptoPath);
+
+    if (sslExists && cryptoExists) {
+      core.info(`Found SSL libraries: ${sslPath}, ${cryptoPath}`);
+      return true;
+    }
+
+    core.warning(`SSL libraries not found: ${sslPath}, ${cryptoPath}`);
+    return false;
+  } catch (error) {
+    core.warning(`Error checking SSL libraries: ${error.message}`);
+    return false;
+  }
+}
+
 run();
