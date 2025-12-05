@@ -10,6 +10,9 @@ inputs:
   api-key:
     description: "API key for authentication"
     required: true
+  project-name:
+    description: "Project name for ROC analysis (format: org/repo)"
+    required: true
   patterns:
     description: "Path to YAML patterns file (relative to config dir)"
     required: true

@@ -30347,6 +30347,7 @@ async function run() {
     const serverUrl = core.getInput("server-url", { required: true });
     const apiKey = core.getInput("api-key", { required: true });
     const patterns = core.getInput("patterns", { required: true });
+    const projectName = core.getInput("project-name", { required: true });
     const configDir = core.getInput("config-dir") || "roc-config";
     const outputDir = core.getInput("output-dir") || "roc-output";
     const dockerImage =
@@ -30357,6 +30358,7 @@ async function run() {
 
     core.info("ROC GitHub Action started");
     core.info(`Server URL: ${serverUrl}`);
+    core.info(`Project Name: ${projectName}`);
     core.info(`Config directory: ${configDir}`);
     core.info(`Pattern file: ${patterns}`);
     core.info(`Output directory: ${outputDir}`);
@@ -30425,6 +30427,8 @@ async function run() {
       serverUrl,
       "--api-key",
       apiKey,
+      "--project-name",
+      projectName,
       "--patterns",
       `/tmp/roc-config/${patterns}`,
       "--watch",
